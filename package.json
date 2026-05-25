@@ -1,5 +1,5 @@
 {
-  "name": "@adminforth/twitch-oauth-adapter",
+  "name": "@adminforth/oauth-adapter-twitch",
   "version": "1.0.6",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -36,7 +36,7 @@
       [
         "semantic-release-slack-bot",
         {
-          "packageName": "@adminforth/twitch-oauth-adapter",
+          "packageName": "@adminforth/oauth-adapter-twitch",
           "notifyOnSuccess": true,
           "notifyOnFail": true,
           "slackIcon": ":package:",
