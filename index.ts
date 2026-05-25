@@ -1,21 +1,34 @@
 import type { OAuth2Adapter } from "adminforth";
 
+type OAuth2UserInfoLocal = {
+  email: string;
+  provider?: string;
+  subject?: string;
+  phone?: string;
+  meta?: Record<string, any>;
+  fullName?: string;
+  profilePictureUrl?: string | null;
+  externalUserId?: string | number | null;
+};
 export default class AdminForthAdapterTwitchOauth2 implements OAuth2Adapter {
   private clientID: string;
   private clientSecret: string;
+  private redirectUri: string;
 
   constructor(options: {
     clientID: string;
     clientSecret: string;
+    redirectUri: string;
   }) {
     this.clientID = options.clientID;
     this.clientSecret = options.clientSecret;
+    this.redirectUri = options.redirectUri;
   }
 
   getAuthUrl(): string {
     const params = new URLSearchParams({
       client_id: this.clientID,
-      redirect_uri: 'http://localhost:3000',
+      redirect_uri: this.redirectUri,
       response_type: 'code',
       scope: 'user:read:email',
       force_verify: 'true'
@@ -23,7 +36,7 @@ export default class AdminForthAdapterTwitchOauth2 implements OAuth2Adapter {
     return `https://id.twitch.tv/oauth2/authorize?${params.toString()}`;
   }
 
-  async getTokenFromCode(code: string, redirect_uri: string): Promise<{ email: string, profilePictureUrl: string, fullName: string }> {
+  async getTokenFromCode(code: string, redirect_uri: string): Promise<OAuth2UserInfoLocal> {
     const tokenRes = await fetch('https://id.twitch.tv/oauth2/token', {
       method: 'POST',
       headers: {
@@ -62,10 +75,16 @@ export default class AdminForthAdapterTwitchOauth2 implements OAuth2Adapter {
     }
 
     return {
+      provider: this.constructor.name,
+      subject: user.id,
       email: user.email,
       profilePictureUrl: user.profile_image_url,
       fullName: user.display_name
     };
+  }
+
+  getName(): string {
+    return 'Twitch';
   }
 
   getIcon(): string {
